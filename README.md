@@ -60,7 +60,7 @@ String of commands to undo what is done by the `ti' string. Programs that output
 String to move cursor sideways to left margin.
 
 `ho'
-String to position cursor at upper left corner.
+String of commands to move the cursor to the upper left corner of the screen (this position is called the home position). In terminals where the upper left corner of the screen is not the same as the beginning of display memory, this command must go to the upper left corner of the screen, not the beginning of display memory. Every display terminal supports this capability, and many application programs refuse to operate if the `ho' capability is missing.
 
 `do'
 String of commands to move the cursor vertically down one line. The effect of sending this string when on the bottom line is undefined; programs should never use it that way. Some programs do use `do' to scroll up one line if used at the bottom line, if `sf' is not defined but `sr' is. This is only to compensate for certain old, incorrect terminal descriptions. (In principle this might actually lead to incorrect behavior on other terminals, but that seems to happen rarely if ever.) But the proper solution is that the terminal description should define `sf' as well as `do' if the command is suitable for scrolling. The original idea was that this string would not contain a newline character and therefore could be used without disabling the kernel's usual habit of converting of newline into a carriage-return newline sequence. But many terminal descriptions do use newline in the `do' string, so this is not possible; a program which sends the `do' string must disable output conversion in the kernel (see section Initialization for Use of Termcap).
