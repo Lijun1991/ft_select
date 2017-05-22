@@ -89,3 +89,85 @@ String of commands to move the cursor right one column. The effect is undefined 
  
   ICANON Enable canonical mode (described below).
   ECHO   Echo input characters.
+  
+  
+  Canonical and noncanonical mode
+       The setting of the ICANON canon flag in c_lflag determines whether
+       the terminal is operating in canonical mode (ICANON set) or
+       noncanonical mode (ICANON unset).  By default, ICANON is set.
+
+       In canonical mode:
+
+       * Input is made available line by line.  An input line is available
+         when one of the line delimiters is typed (NL, EOL, EOL2; or EOF at
+         the start of line).  Except in the case of EOF, the line delimiter
+         is included in the buffer returned by read(2).
+
+       * Line editing is enabled (ERASE, KILL; and if the IEXTEN flag is
+         set: WERASE, REPRINT, LNEXT).  A read(2) returns at most one line
+         of input; if the read(2) requested fewer bytes than are available
+         in the current line of input, then only as many bytes as requested
+         are read, and the remaining characters will be available for a
+         future read(2).
+
+       * The maximum line length is 4096 chars (including the terminating
+         newline character); lines longer than 4096 chars are truncated.
+         After 4095 characters, input processing (e.g., ISIG and ECHO*
+         processing) continues, but any input data after 4095 characters up
+         to (but not including) any terminating newline is discarded.  This
+         ensures that the terminal can always receive more input until at
+         least one line can be read.
+
+       In noncanonical mode input is available immediately (without the user
+       having to type a line-delimiter character), no input processing is
+       performed, and line editing is disabled.  The read buffer will only
+       accept 4095 chars; this provides the necessary space for a newline
+       char if the input mode is switched to canonical.  The settings of MIN
+       (c_cc[VMIN]) and TIME (c_cc[VTIME]) determine the circumstances in
+       which a read(2) completes; there are four distinct cases:
+
+       MIN == 0, TIME == 0 (polling read)
+              If data is available, read(2) returns immediately, with the
+              lesser of the number of bytes available, or the number of
+              bytes requested.  If no data is available, read(2) returns 0.
+
+       MIN > 0, TIME == 0 (blocking read)
+              read(2) blocks until MIN bytes are available, and returns up
+              to the number of bytes requested.
+
+       MIN == 0, TIME > 0 (read with timeout)
+              TIME specifies the limit for a timer in tenths of a second.
+              The timer is started when read(2) is called.  read(2) returns
+              either when at least one byte of data is available, or when
+              the timer expires.  If the timer expires without any input
+              becoming available, read(2) returns 0.  If data is already
+              available at the time of the call to read(2), the call behaves
+              as though the data was received immediately after the call.
+
+       MIN > 0, TIME > 0 (read with interbyte timeout)
+              TIME specifies the limit for a timer in tenths of a second.
+              Once an initial byte of input becomes available, the timer is
+              restarted after each further byte is received.  read(2)
+              returns when any of the following conditions is met:
+
+              *  MIN bytes have been received.
+
+              *  The interbyte timer expires.
+
+              *  The number of bytes requested by read(2) has been received.
+                 (POSIX does not specify this termination condition, and on
+                 some other implementations read(2) does not return in this
+                 case.)
+
+              Because the timer is started only after the initial byte
+              becomes available, at least one byte will be read.  If data is
+              already available at the time of the call to read(2), the call
+              behaves as though the data was received immediately after the
+              call.
+
+       POSIX does not specify whether the setting of the O_NONBLOCK file
+       status flag takes precedence over the MIN and TIME settings.  If
+       O_NONBLOCK is set, a read(2) in noncanonical mode may return
+       immediately, regardless of the setting of MIN or TIME.  Furthermore,
+       if no data is available, POSIX permits a read(2) in noncanonical mode
+       to return either 0, or -1 with errno set to EAGAIN.
