@@ -70,3 +70,22 @@ String of commands to move the cursor vertically up one line. The effect of send
 
 `nd'
 String of commands to move the cursor right one column. The effect is undefined if the cursor is at the right margin; do not use this command there, not even if `am' is present
+
+
+
+
+ The termios structure
+       Many of the functions described here have a termios_p argument that
+       is a pointer to a termios structure.  This structure contains at
+       least the following members:
+
+           tcflag_t c_iflag;      /* input modes */
+           tcflag_t c_oflag;      /* output modes */
+           tcflag_t c_cflag;      /* control modes */
+           tcflag_t c_lflag;      /* local modes */
+           cc_t     c_cc[NCCS];   /* special characters */
+           
+ c_lflag flag constants:
+ 
+  ICANON Enable canonical mode (described below).
+  ECHO   Echo input characters.
