@@ -90,6 +90,11 @@ String of commands to move the cursor right one column. The effect is undefined 
   ICANON Enable canonical mode (described below).
   ECHO   Echo input characters.
   
+ The c_cc array defines the terminal special characters.  The symbolic
+       indices (initial values) and meaning are:
+   VMIN   Minimum number of characters for noncanonical read (MIN).
+   VTIME  Timeout in deciseconds for noncanonical read (TIME).
+   
   
   Canonical and noncanonical mode
        The setting of the ICANON canon flag in c_lflag determines whether
